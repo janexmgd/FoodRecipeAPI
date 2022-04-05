@@ -82,7 +82,6 @@ const recipeController = {
         try {
             const id = req.params.id
             const data = await recipeModel.recipeDetailData(id)
-            // console.log(data.rows[0].is_active);
             if (data.rows[0].is_active === 0) {
                 throw Error(`Maaf recipe id ${id} sedang nonaktif`)
             }
@@ -127,12 +126,11 @@ const recipeController = {
             const video = req.files.video ? req.files.video[0].filename : a.rows[0].video
             const date = new Date().toISOString()
             const usersId = req.APP_DATA.tokenDecoded.id
-            const isActive = 1
             // validation for input
-            if (!title || !ingredients || !isActive) {
+            if (!title || !ingredients) {
                 throw Error('Field title, ingredients, isActive belum terisi semua')
             }
-            const data = await recipeModel.recipeEditData(id, photo, title, ingredients, video, date, usersId, isActive)
+            const data = await recipeModel.recipeEditData(id, photo, title, ingredients, video, date, usersId)
             // data change ?
             if (data.rowCount === 0) {
                 throw Error(`Data tidak diedit karena recipe ${id} tidak ditemukan`)

@@ -65,9 +65,9 @@ const recipeModel = {
                 })
         })
     },
-    recipeEditData: (id, photo, title, ingredients, video, date, usersId, isActive) => {
+    recipeEditData: (id, photo, title, ingredients, video, date, usersId) => {
         return new Promise((resolve, reject) => {
-            db.query(`UPDATE recipe SET photo='${photo}', title='${title}', ingredients='${ingredients}', video='${video}', date='${date}', users_id=${usersId}, is_active=${isActive} WHERE id=${id}`,
+            db.query(`UPDATE recipe SET photo='${photo}', title='${title}', ingredients='${ingredients}', video='${video}', date='${date}', users_id=${usersId} WHERE id=${id}`,
                 (err, result) => {
                     if (err) {
                         reject(err)
