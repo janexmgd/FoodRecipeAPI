@@ -1,58 +1,51 @@
-const multer = require('multer')
-const path = require('path')
-const {
-    failed
-} = require('../helpers/response')
+const multer = require("multer");
+const path = require("path");
+const { failed } = require("../helpers/response");
 // manajemen file
 const multerUpload = multer({
-    storage: multer.diskStorage({
-        destination: (req, file, cb) => {
-            cb(null, './public')
-        },
-        filename: (req, file, cb) => {
-            const ext = path.extname(file.originalname)
-            const filename = `${Date.now()}${ext}`
-            cb(null, filename)
-        }
-    }),
-    fileFilter: (req, file, cb) => {
-        const ext = path.extname(file.originalname)
-        if (file.fieldname === 'photo') {
-            if (!['.jpg', '.png'].includes(ext)) {
-                return cb(new Error('Only images with jpg and png are allowed'));
-            }
-            if (file.size > 2097152) {
-                return cb(new Error('File size exceeds 2 MB'));
-            }
-        }
-        if (file.fieldname === 'video') {
-            if (!['.mp4'].includes(ext)) {
-                return cb(new Error('Only mp4 are allowed'));
-            }
-        }
-        cb(null, true);
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "./public");
+    },
+    filename: (req, file, cb) => {
+      const ext = path.extname(file.originalname);
+      const filename = `${Date.now()}${ext}`;
+      cb(null, filename);
+    },
+  }),
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    const fileSize = parseInt(req.headers["content-length"]);
+    const maxSize = 2 * 1024 * 1024;
+    if (fileSize > maxSize) {
+      const error = {
+        message: "File size exceeds 2 MB",
+      };
+      return cb(error, false);
     }
-})
+    if (ext === ".jpg" || ext === ".png") {
+      cb(null, true);
+    } else {
+      const error = {
+        message: "file must be jpg or png",
+      };
+      console.log(ext);
+      cb(error, false);
+    }
+  },
+});
 
 // middleware
 const upload = (req, res, next) => {
-    const multermultiUpload = multerUpload.fields([{
-        name: 'photo',
-        maxCount: 1
-    }, {
-        name: 'video',
-        maxCount: 1
-    }]);
-    multermultiUpload(req, res, (err) => {
-        if (!req) {
-            next()
-        }
-        if (err) {
-            failed(res, err.message, 'failed', 'failed upload file')
-        } else {
-            next()
-        }
-    })
-}
+  const multerSingle = multerUpload.single("photo");
+  multerSingle(req, res, (err) => {
+    if (err) {
+      failed(res, err, "error", "an error occured");
+    } else {
+      console.log(req.file);
+      next();
+    }
+  });
+};
 
-module.exports = upload
+module.exports = upload;
