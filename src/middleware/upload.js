@@ -40,9 +40,9 @@ const upload = (req, res, next) => {
   const multerSingle = multerUpload.single("photo");
   multerSingle(req, res, (err) => {
     if (err) {
-      failed(res, err, "error", "an error occured");
+      console.log(err);
+      failed(res, err, "error", err);
     } else {
-      console.log(req.file);
       next();
     }
   });

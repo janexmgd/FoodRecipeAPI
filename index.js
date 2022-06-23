@@ -20,9 +20,9 @@ const authRoute = require("./src/routes/auth.route");
 require("dotenv").config();
 const app = express();
 app.use(
-  helmet({
-    crossOriginResourcePolicy: false,
-  })
+	helmet({
+		crossOriginResourcePolicy: false,
+	})
 );
 app.use(xssClean());
 app.use(cors());
@@ -32,6 +32,7 @@ app.use(recipeRoute);
 app.use(commentRoute);
 app.use(authRoute);
 app.use(express.static("public"));
-app.listen(process.env.LISTENPORT, () => {
-  console.log(`service RUN at port ${process.env.LISTENPORT}`);
+const PORT = process.env.LISTENPORT || 3004;
+app.listen(PORT, "0.0.0.0", () => {
+	console.log(`service RUN at port ${PORT}`);
 });
