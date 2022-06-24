@@ -22,7 +22,7 @@ module.exports = {
 				return;
 			}
 			if (emailCheck.rowCount > 0) {
-				console.log(req.file.filename);
+				//console.log(req.file.filename);
 				deleteFile(`public/${req.file.filename}`);
 				const err = {
 					message: "email is already registered",
@@ -65,7 +65,7 @@ module.exports = {
 					success(res, data, "success", "register berhasil", null);
 				})
 				.catch((err) => {
-					console.log(err);
+					//console.log(err);
 					failed(res, err.detail, "failed", "register gagal");
 				});
 		} catch (error) {
@@ -158,7 +158,7 @@ module.exports = {
 				failed(res, err.message, "failed", "invalid argument");
 			}
 		} catch (error) {
-			console.log(error);
+			// console.log(error);
 			failed(res, error, "failed", "internal server error");
 		}
 	},

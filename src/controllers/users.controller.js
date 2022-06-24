@@ -37,14 +37,11 @@ const userController = {
 	},
 	usersEdit: async (req, res) => {
 		try {
-			const id = req.params.id;
+			const id = req.APP_DATA.tokenDecoded.id;
+			//return console.log(id);
 			const { name, email, phone } = req.body;
 
 			// const photo = req.files.photo ? req.files.photo[0].filename : "";
-			if (!name || !email || !phone) {
-				// validation for input
-				throw Error("Field name,email,phone belum terisi semua");
-			}
 			const a = await userModel.usersDetailData(id);
 			let data;
 			if (req.file) {
@@ -73,15 +70,16 @@ const userController = {
 					`Edit data users gagal karena users dengan id ${id} tidak ditemukan`
 				);
 			}
-
-			success(res, data, "success", `success edit data id ${id}`);
+			const dataEdited = await userModel.usersDetailData(id);
+			//return console.log(dataEdited);
+			success(res, dataEdited.rows[0], "success", `success edit data id ${id}`);
 		} catch (err) {
 			failed(res, err.message, "failed", "internal server error");
 		}
 	},
 	usersDelete: async (req, res) => {
 		try {
-			const id = req.params.id;
+			const id = req.APP_DATA.tokenDecoded.id;
 			const user = await userModel.usersDetailData(id);
 			if (user.rowCount === 0) {
 				throw Error(`Delete data gagal, karena id ${id} tidak ditemukan`);
@@ -98,11 +96,20 @@ const userController = {
 		try {
 			const id = req.params.id;
 			const { isActive } = req.body;
-			const data = await userModel.usersModeData(id, isActive);
-			if (data.rowCount === 0) {
+			const user = await userModel.usersDetailData(id);
+			if (user.rowCount == 0) {
 				throw Error(`Change mode users gagal, karena id ${id} tidak ditemukan`);
 			}
-			success(res, data, "success", "success ganti mode users");
+			//return console.log(user.rows[0].is_active);
+			if (user.rows[0].is_active == 1 && isActive == 1) {
+				throw Error(`This user is already active`);
+			}
+			if (user.rows[0].is_active == 0 && isActive == 0) {
+				throw Error(`This user is already nonactive`);
+			}
+			await userModel.usersModeData(id, isActive);
+			const userEdited = await userModel.usersDetailData(id);
+			success(res, userEdited.rows[0], "success", "success ganti mode users");
 		} catch (err) {
 			failed(res, err.message, "failed", "internal server error");
 		}
@@ -112,7 +119,7 @@ const userController = {
 			const { confirmNewPass, newPass } = req.body;
 			if (confirmNewPass === newPass) {
 				const id = req.APP_DATA.tokenDecoded.id;
-				const hashNewPass = await bcrypt.hashSync(newPass, 10);
+				const hashNewPass = await bcrypt.hash(newPass, 10);
 				userModel
 					.usersResetPassData(id, hashNewPass)
 					.then((result) => {
