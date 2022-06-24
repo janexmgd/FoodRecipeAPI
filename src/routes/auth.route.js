@@ -6,6 +6,7 @@ const {
 } = require("../controllers/auth.controller");
 
 // import middleware
+const usersUpload = require("../middleware/usersUpload");
 const upload = require("../middleware/upload");
 const {
 	registerValidation,
@@ -15,7 +16,7 @@ const validation = require("../middleware/validation");
 
 const router = express.Router();
 router
-	.post("/auth/register", upload, registerValidation, validation, register) // uncomment its pakai middleware
+	.post("/auth/register", usersUpload, registerValidation, validation, register) // uncomment its pakai middleware
 	.post("/auth/login", loginValidation, validation, login)
 	.get("/auth/verify-email", verifyEmail);
 module.exports = router;
