@@ -6,6 +6,7 @@ const authModel = require("../models/auth.model");
 const crypto = require("crypto");
 const sendEmail = require("../helpers/sendEmail");
 const deleteFile = require("../helpers/deleteFile");
+const { v4: uuidv4 } = require("uuid");
 
 module.exports = {
 	register: async (req, res) => {
@@ -37,6 +38,7 @@ module.exports = {
 				failed(res, err.message, "failed", "register gagal");
 				return;
 			}
+			const id = uuidv4();
 			const level = 1;
 			const isActive = 0;
 			const photo = req.file ? req.file.filename : "";
@@ -44,6 +46,7 @@ module.exports = {
 			const passwordHashed = await bcrypt.hash(password, 10);
 			const isVerified = 0;
 			const data = {
+				id,
 				name,
 				email,
 				phone,
@@ -80,37 +83,49 @@ module.exports = {
 			authModel
 				.checkUsername(email)
 				.then((result) => {
-					console.log();
 					// cek apakah ada data yang cocok dengan email?
 					if (result.rowCount > 0) {
-						if (result.rows[0].is_active === 1) {
-							// compare password from body dgn password db
-							bcrypt
-								.compare(password, result.rows[0].password)
-								.then(async (match) => {
-									// compare berhasil?
-									if (match) {
-										// login sukses dan memberi token
-										const token = await jwtToken(result.rows[0]);
-										success(
-											// aslinya successWithToken
-											res,
-											{ token, user: result.rows[0] },
-											"success",
-											"Login success"
-										);
-									} else {
-										// login gagal
-										failed(res, null, "failed", "email atau password salah");
-									}
-								});
+						if (result.rows[0].verify_token == null) {
+							if (result.rows[0].is_verified == 1) {
+								if (result.rows[0].is_active === 1) {
+									// compare password from body dgn password db
+									bcrypt
+										.compare(password, result.rows[0].password)
+										.then(async (match) => {
+											// compare berhasil?
+											if (match) {
+												// login sukses dan memberi token
+												const token = await jwtToken(result.rows[0]);
+												success(
+													// aslinya successWithToken
+													res,
+													{ token, user: result.rows[0] },
+													"success",
+													"Login success"
+												);
+											} else {
+												// login gagal
+												failed(
+													res,
+													null,
+													"failed",
+													"email atau password salah"
+												);
+											}
+										});
+								} else {
+									failed(
+										res,
+										null,
+										"failed",
+										"akun anda dinonaktifkan, kontak admin untuk mengaktifkan"
+									);
+								}
+							} else {
+								failed(res, null, "failed", "akun belum terverifikasi");
+							}
 						} else {
-							failed(
-								res,
-								null,
-								"failed",
-								"akun anda dinonaktifkan, kontak admin untuk mengaktifkan"
-							);
+							failed(res, null, "failed", "email belum diverifikasi");
 						}
 					} else {
 						// email tidak ada
@@ -122,6 +137,29 @@ module.exports = {
 				});
 		} catch (error) {
 			failed(res, error.message, "failed", "internal server error");
+		}
+	},
+	verifyEmail: async (req, res) => {
+		try {
+			const { token } = req.query;
+			const verifyTokenCheck = await authModel.verifyTokenCheck(token);
+
+			if (verifyTokenCheck.rowCount > 0) {
+				authModel
+					.verifyingUser(token)
+					.then(() => {
+						res.send({ message: "email is verified" });
+					})
+					.catch(() => {});
+			} else {
+				const err = {
+					message: "verify token is invalid",
+				};
+				failed(res, err.message, "failed", "invalid argument");
+			}
+		} catch (error) {
+			console.log(error);
+			failed(res, error, "failed", "internal server error");
 		}
 	},
 };

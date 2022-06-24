@@ -34,5 +34,6 @@ app.use(authRoute);
 app.use(express.static("public"));
 const PORT = process.env.LISTENPORT || 3004;
 app.listen(PORT, "0.0.0.0", () => {
+	console.clear()
 	console.log(`service RUN at port ${PORT}`);
 });

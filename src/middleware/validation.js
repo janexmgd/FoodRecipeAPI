@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const { failed } = require("../helpers/response");
+const deleteFile = require("../helpers/deleteFile");
 
 module.exports = (req, res, next) => {
 	try {
