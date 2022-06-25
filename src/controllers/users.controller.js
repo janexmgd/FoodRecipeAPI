@@ -45,7 +45,7 @@ const userController = {
 			const a = await userModel.usersDetailData(id);
 			let data;
 			if (req.file) {
-				console.log(a.rows[0].photo);
+				//console.log(a.rows[0].photo);
 				deleteFile(`public/${a.rows[0].photo}`);
 
 				data = await userModel.usersEditData(

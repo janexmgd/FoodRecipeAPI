@@ -1,6 +1,9 @@
 /* eslint-disable no-unneeded-ternary */
 const recipeModel = require("../models/recipe.model");
 const { success, failed } = require("../helpers/response");
+const { v4: uuidv4 } = require("uuid");
+const deleteFile = require("../helpers/deleteFile");
+
 const recipeController = {
 	recipeAdmin: async (req, res) => {
 		try {
@@ -98,26 +101,31 @@ const recipeController = {
 	recipeInsert: async (req, res) => {
 		try {
 			const { title, ingredients, video } = req.body;
-
+			if (!req.file) {
+				throw Error("u need to upload photo for this recipe");
+			}
+			const id = uuidv4();
 			const isActive = 1;
-			const photo = req.file ? req.file.filename : "";
+			const photo = req.file.filename;
 			// input usersId from decoded jwt auth
 			const usersId = req.APP_DATA.tokenDecoded.id;
 			// input date from js built in function with iso string format
 			const date = new Date().toISOString();
 			// check the required input is filled in all
-			if (!title || !ingredients) {
-				throw Error("Field tittle, ingredients, isActive belum terisi semua");
-			}
-			const data = await recipeModel.recipeInsertData(
-				photo,
+
+			const data = {
+				id,
 				title,
 				ingredients,
 				video,
-				date,
+				isActive,
+				photo,
 				usersId,
-				isActive
-			);
+				date,
+			};
+			//return console.log(data);
+			await recipeModel.recipeInsertData(data);
+
 			success(res, data, "success", "berhasil menambahkan recipe");
 		} catch (err) {
 			failed(res, err.message, "failed", "internal server error");
@@ -126,34 +134,43 @@ const recipeController = {
 	recipeEdit: async (req, res) => {
 		try {
 			const id = req.params.id;
-			const { title, ingredients } = req.body;
-			const a = await recipeModel.recipeDetailData(id);
-			const photo = req.files.photo
-				? req.files.photo[0].filename
-				: a.rows[0].photo;
-			const video = req.files.video
-				? req.files.video[0].filename
-				: a.rows[0].video;
-			const date = new Date().toISOString();
-			const usersId = req.APP_DATA.tokenDecoded.id;
-			// validation for input
-			if (!title || !ingredients) {
-				throw Error("Field title, ingredients, isActive belum terisi semua");
-			}
-			const data = await recipeModel.recipeEditData(
-				id,
-				photo,
-				title,
-				ingredients,
-				video,
-				date,
-				usersId
-			);
-			// data change ?
-			if (data.rowCount === 0) {
+			const { title, ingredients, video } = req.body;
+
+			const detailOld = await recipeModel.recipeDetailData(id);
+			if (detailOld.rowCount === 0) {
 				throw Error(`Data tidak diedit karena recipe ${id} tidak ditemukan`);
 			}
-			success(res, data, "success", "berhasil edit recipe");
+			const date = new Date().toISOString();
+			const usersId = req.APP_DATA.tokenDecoded.id;
+
+			let data;
+			if (req.file) {
+				//return console.log(detailOld.rows[0].photo);
+				deleteFile(`public/${detailOld.rows[0].photo}`);
+
+				data = await recipeModel.recipeEditData(
+					id,
+					title,
+					ingredients,
+					video,
+					date,
+					usersId,
+					req.file.filename
+				);
+			} else {
+				data = await recipeModel.recipeEditData(
+					id,
+					title,
+					ingredients,
+					video,
+					date,
+					usersId,
+					detailOld.rows[0].photo
+				);
+			}
+
+			const dataEdited = await recipeModel.recipeDetailData(id);
+			success(res, dataEdited.rows[0], "success", "berhasil edit recipe");
 		} catch (err) {
 			failed(res, err.message, failed, "error");
 		}
@@ -161,11 +178,16 @@ const recipeController = {
 	recipeDelete: async (req, res) => {
 		try {
 			const id = req.params.id;
-			const data = await recipeModel.recipeDeleteData(id);
-			if (data.rowCount === 0) {
+			const detailRecipe = await recipeModel.recipeDetailData(id);
+			if (detailRecipe.rowCount === 0) {
 				throw Error(`Delete data gagal, karena id ${id} tidak ditemukan`);
 			}
-			success(res, data, "success", `Delete recipe dengan id ${id} berhasil`);
+			//return console.log(detailRecipe.rows[0].photo);
+
+			// deleting photo
+			deleteFile(`public/${detailRecipe.rows[0].photo}`);
+			await recipeModel.recipeDeleteData(id);
+			success(res, null, "success", `Delete recipe dengan id ${id} berhasil`);
 		} catch (err) {
 			failed(res, err.message, "failed", "error");
 		}
@@ -211,14 +233,25 @@ const recipeController = {
 		try {
 			const id = req.params.id;
 			const { isActive } = req.body;
-			if (isActive > 1 || isActive < 0) {
-				throw Error("invalid input");
-			}
-			const data = await recipeModel.recipeModeData(id, isActive);
-			if (data.rowCount === 0) {
+			const detailRecipe = await recipeModel.recipeDetailData(id);
+
+			if (detailRecipe.rowCount == 0) {
 				throw Error(`invalid id`);
 			}
-			success(res, data, "success", `berhasil mengubah mode recipe id ${id}`);
+			if (detailRecipe.rows[0].is_active == 1 && isActive == 1) {
+				throw Error(`This recipe is already active`);
+			}
+			if (detailRecipe.rows[0].is_active == 0 && isActive == 0) {
+				throw Error(`This recipe is already nonactive`);
+			}
+			await recipeModel.recipeModeData(id, isActive);
+			const updatedRecipe = await recipeModel.recipeDetailData(id);
+			success(
+				res,
+				updatedRecipe.rows[0],
+				"success",
+				`berhasil mengubah mode recipe id ${id}`
+			);
 		} catch (error) {
 			failed(res, error.message, "failed", "failed update");
 		}
