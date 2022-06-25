@@ -26,8 +26,12 @@ module.exports = {
 	},
 	isOwnedRecipe: async (req, res, next) => {
 		const id = req.params.id;
-		const p = await recipeModel.getRecipeUsersId(id);
-		const { users_id } = p.rows[0];
+		const recipe = await recipeModel.getRecipeUsersId(id);
+		if (recipe.rowCount == 0) {
+			failed(res, null, "failed", "recipe not found");
+			return;
+		}
+		const { users_id } = recipe.rows[0];
 		if (req.APP_DATA.tokenDecoded.id === users_id) {
 			next();
 		} else {
@@ -36,8 +40,12 @@ module.exports = {
 	},
 	isOwnedComment: async (req, res, next) => {
 		const id = req.params.id;
-		const p = await commentModel.getCommentUsersId(id);
-		const { users_id } = p.rows[0];
+		const comment = await commentModel.commentDetailData(id);
+		if (comment.rowCount == 0) {
+			failed(res, null, "failed", "comment not found");
+			return;
+		}
+		const { users_id } = comment.rows[0];
 		if (req.APP_DATA.tokenDecoded.id === users_id) {
 			next();
 		} else {
