@@ -23,13 +23,12 @@ const multerUpload = multer({
 			};
 			return cb(error, false);
 		}
-		if (ext === ".jpg" || ext === ".png") {
+		if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
 			cb(null, true);
 		} else {
 			const error = {
 				message: "file must be jpg or png",
 			};
-			console.log(ext);
 			cb(error, false);
 		}
 	},
@@ -40,8 +39,12 @@ const upload = (req, res, next) => {
 	const multerSingle = multerUpload.single("photo");
 	multerSingle(req, res, (err) => {
 		if (err) {
-			console.log(err);
-			failed(res, err, "error", err);
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
 		} else {
 			next();
 		}

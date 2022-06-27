@@ -18,9 +18,21 @@ const commentController = {
 				dataPerPage: limitValue,
 				totalPage: Math.ceil(totalData / limitValue),
 			};
-			success(res, data.rows, "success", "get data success", pagination);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: `Success get comment`,
+				data: data.rows,
+				paggination: pagination,
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "error occured");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	commentDetail: async (req, res) => {
@@ -28,11 +40,32 @@ const commentController = {
 			const id = req.params.id;
 			const data = await commentModel.commentDetailData(id);
 			if (data.rowCount === 0) {
-				throw Error(`Data dengan id ${id} tidak ditemukan`);
+				const err = {
+					message: `Maaf data tidak ditemukan`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
-			success(res, data.rows[0], success, `Data dengan id ${id} ditemukan`);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: `Success get comment with id ${id}`,
+				data: data.rows[0],
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "error occured");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	commentInsert: async (req, res) => {
@@ -42,7 +75,16 @@ const commentController = {
 			const findRecipe = await recipeModel.recipeDetailData(recipeId);
 
 			if (findRecipe.rowCount == 0) {
-				throw Error("recipe tidak ditemukan");
+				const err = {
+					message: "recipe tidak ditemukan",
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			const usersId = req.APP_DATA.tokenDecoded.id;
 
@@ -54,9 +96,21 @@ const commentController = {
 			};
 
 			await commentModel.commentInsertData(data);
-			success(res, data, "success", "berhasil menambahkan comment");
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "berhasil menambahkan comment",
+				data: data,
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "error occured");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	commentEdit: async (req, res) => {
@@ -76,16 +130,32 @@ const commentController = {
 			//	usersId
 			//);
 			if (data.rowCount === 0) {
-				throw Error(`Edit data gagal karena comment id ${id} tidak ditemukan`);
+				const err = {
+					message: `Edit data gagal karena comment id ${id} tidak ditemukan`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
-			success(
-				res,
-				data,
-				"success",
-				`Edit data comment dengan id ${id} berhasil`
-			);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: `Edit data comment dengan id ${id} berhasil`,
+				data: data,
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "error occured");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	commentDelete: async (req, res) => {
@@ -93,11 +163,33 @@ const commentController = {
 			const id = req.params.id;
 			const data = await commentModel.commentDeleteData(id);
 			if (data.rowCount === 0) {
-				throw Error(`Delete data gagal, karena id ${id} tidak ditemukan`);
+				const err = {
+					message: `Delete data gagal, karena id ${id} tidak ditemukan`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
-			success(res, null, "success", `Delete data comment id ${id} berhasil`);
+
+			success(res, {
+				code: 200,
+				status: "success",
+				message: `Delete data comment id ${id} berhasil`,
+				data: null,
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "error occured");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	commentByRecipe: async (req, res) => {
@@ -105,18 +197,32 @@ const commentController = {
 			const recipeId = req.params.recipeId;
 			const data = await commentModel.commentByRecipeData(recipeId);
 			if (data.rowCount === 0) {
-				throw Error(
-					`Data comment dengan recipe_id ${recipeId} tidak ditemukan`
-				);
+				const err = {
+					message: `Data comment dengan recipe_id ${recipeId} tidak ditemukan`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
-			success(
-				res,
-				data.rows,
-				"success",
-				"berhasil menampilkan data comment dan recipe"
-			);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "berhasil menampilkan data comment dan recipe",
+				data: data.rows,
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "error occured");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 };

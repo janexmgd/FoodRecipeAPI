@@ -18,24 +18,38 @@ module.exports = {
 				const err = {
 					message: "u need to upload your display picture for your profile",
 				};
-				failed(res, err.message, "failed", "register gagal");
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
 				return;
 			}
 			if (emailCheck.rowCount > 0) {
-				//console.log(req.file.filename);
+				// console.log(req.file.filename);
 				deleteFile(`public/${req.file.filename}`);
 				const err = {
 					message: "email is already registered",
 				};
-				failed(res, err.message, "failed", "register gagal");
-
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
 				return;
 			}
 			if (!name || !email || !phone || !password) {
 				const err = {
 					message: "Field name, email, phone, password belum terisi semua",
 				};
-				failed(res, err.message, "failed", "register gagal");
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
 				return;
 			}
 			const id = uuidv4();
@@ -65,12 +79,22 @@ module.exports = {
 					success(res, data, "success", "register berhasil", null);
 				})
 				.catch((err) => {
-					//console.log(err);
-					failed(res, err.detail, "failed", "register gagal");
+					// console.log(err);
+					failed(res, {
+						code: 500,
+						status: "error",
+						message: err.message,
+						error: [],
+					});
+					return;
 				});
 		} catch (error) {
-			console.log(error);
-			// failed(res, error.message, "failed", "Internal server error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: error.message,
+				error: [],
+			});
 		}
 	},
 	login: async (req, res) => {
@@ -96,47 +120,81 @@ module.exports = {
 											if (match) {
 												// login sukses dan memberi token
 												const token = await jwtToken(result.rows[0]);
-												success(
-													// aslinya successWithToken
-													res,
-													{ token, user: result.rows[0] },
-													"success",
-													"Login success"
-												);
+												success(res, {
+													code: 200,
+													status: "success",
+													message: "login success",
+													token: token,
+												});
 											} else {
 												// login gagal
-												failed(
-													res,
-													null,
-													"failed",
-													"email atau password salah"
-												);
+												const err = {
+													message: "e-mail or password wrong",
+												};
+												failed(res, {
+													code: 500,
+													status: "error",
+													message: err.message,
+													error: [],
+												});
 											}
 										});
 								} else {
-									failed(
-										res,
-										null,
-										"failed",
-										"akun anda dinonaktifkan, kontak admin untuk mengaktifkan"
-									);
+									const err = {
+										message: "account is blocked",
+									};
+									failed(res, {
+										code: 500,
+										status: "error",
+										message: err.message,
+										error: [],
+									});
 								}
 							} else {
-								failed(res, null, "failed", "akun belum terverifikasi");
+								const err = {
+									message: "e-mail is not verified",
+								};
+								failed(res, {
+									code: 500,
+									status: "error",
+									message: err.message,
+									error: [],
+								});
 							}
 						} else {
-							failed(res, null, "failed", "email belum diverifikasi");
+							const err = {
+								message: "e-mail is not verified",
+							};
+							failed(res, {
+								code: 500,
+								status: "error",
+								message: err.message,
+								error: [],
+							});
 						}
 					} else {
 						// email tidak ada
-						failed(res, null, "failed", "email atau password salah");
+						const err = {
+							message: "email not registered",
+						};
+						failed(res, {
+							code: 500,
+							status: "error",
+							message: err.message,
+							error: [],
+						});
 					}
 				})
 				.catch((err) => {
 					failed(res, err.message, "failed", "internal server error");
 				});
 		} catch (error) {
-			failed(res, error.message, "failed", "internal server error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: error.message,
+				error: [],
+			});
 		}
 	},
 	verifyEmail: async (req, res) => {

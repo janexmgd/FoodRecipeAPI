@@ -20,7 +20,16 @@ const recipeController = {
 				limitValue
 			);
 			if (data.rowCount === 0) {
-				throw Error(`tidak ditemukan data dengan kata kunci ${searchQuery}`);
+				const err = {
+					message: `tidak ditemukan data dengan kata kunci ${searchQuery}`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			// cek pakai search apa enggak
 			if (search) {
@@ -29,17 +38,36 @@ const recipeController = {
 					dataPerPage: limitValue,
 					totalPage: Math.ceil(data.rowCount / limitValue),
 				};
-				success(res, data.rows, "success", "get data success", pagination);
+				success(res, {
+					code: 200,
+					status: "success",
+					message: `Success get Recipe`,
+					data: data.rows,
+					paggination: pagination,
+				});
 			} else {
 				const pagination = {
 					currentPage: pageValue,
 					dataPerPage: limitValue,
 					totalPage: Math.ceil(totalData / limitValue),
 				};
-				success(res, data.rows, "success", "get data success", pagination);
+
+				success(res, {
+					code: 200,
+					status: "success",
+					message: `Success get Recipe`,
+					data: data.rows,
+					paggination: pagination,
+				});
 			}
 		} catch (err) {
-			failed(res, err.message, "failed", "internal server error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: error.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	recipeMain: async (req, res) => {
@@ -59,7 +87,16 @@ const recipeController = {
 				sortQuery
 			);
 			if (data.rowCount === 0) {
-				throw Error(`data not found`);
+				const err = {
+					message: `tidak ditemukan data dengan kata kunci ${searchQuery}`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			// cek pakai search apa enggak
 			if (search) {
@@ -68,17 +105,36 @@ const recipeController = {
 					dataPerPage: limitValue,
 					totalPage: Math.ceil(data.rowCount / limitValue),
 				};
-				success(res, data.rows, "success", "get data success", pagination);
+				success(res, {
+					code: 200,
+					status: "success",
+					message: `Success get Recipe`,
+					data: data.rows,
+					paggination: pagination,
+				});
 			} else {
 				const pagination = {
 					currentPage: pageValue,
 					dataPerPage: limitValue,
 					totalPage: Math.ceil(totalData / limitValue),
 				};
-				success(res, data.rows, "success", "get data success", pagination);
+
+				success(res, {
+					code: 200,
+					status: "success",
+					message: `Success get Recipe`,
+					data: data.rows,
+					paggination: pagination,
+				});
 			}
 		} catch (err) {
-			failed(res, err.message, "failed", "internal server error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: error.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	recipeDetail: async (req, res) => {
@@ -86,23 +142,48 @@ const recipeController = {
 			const id = req.params.id;
 			const data = await recipeModel.recipeDetailData(id);
 			if (data.rows[0].is_active === 0) {
-				throw Error(`Maaf recipe id ${id} sedang nonaktif`);
+				const err = {
+					message: `Maaf recipe id ${id} sedang nonaktif`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
-			success(
-				res,
-				data.rows[0],
-				"success",
-				`Ditemukan data recipe dengan id ${id}`
-			);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: `Success get Recipe with id ${id}`,
+				data: data.rows[0],
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "internal server error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: error.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	recipeInsert: async (req, res) => {
 		try {
 			const { title, ingredients, video } = req.body;
 			if (!req.file) {
-				throw Error("u need to upload photo for this recipe");
+				const err = {
+					message: `u need to upload photo for this recipe`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			const id = uuidv4();
 			const isActive = 1;
@@ -126,9 +207,21 @@ const recipeController = {
 			//return console.log(data);
 			await recipeModel.recipeInsertData(data);
 
-			success(res, data, "success", "berhasil menambahkan recipe");
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "Berhasil menambahkan recipe",
+				data: data,
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "internal server error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	recipeEdit: async (req, res) => {
@@ -138,7 +231,16 @@ const recipeController = {
 
 			const detailOld = await recipeModel.recipeDetailData(id);
 			if (detailOld.rowCount === 0) {
-				throw Error(`Data tidak diedit karena recipe ${id} tidak ditemukan`);
+				const err = {
+					message: `Data tidak diedit karena recipe ${id} tidak ditemukan`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			const date = new Date().toISOString();
 			const usersId = req.APP_DATA.tokenDecoded.id;
@@ -170,9 +272,21 @@ const recipeController = {
 			}
 
 			const dataEdited = await recipeModel.recipeDetailData(id);
-			success(res, dataEdited.rows[0], "success", "berhasil edit recipe");
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "success edit recipe",
+				data: dataEdited.rows[0],
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, failed, "error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	recipeDelete: async (req, res) => {
@@ -180,16 +294,37 @@ const recipeController = {
 			const id = req.params.id;
 			const detailRecipe = await recipeModel.recipeDetailData(id);
 			if (detailRecipe.rowCount === 0) {
-				throw Error(`Delete data gagal, karena id ${id} tidak ditemukan`);
+				const err = {
+					message: `Delete data gagal, karena id ${id} tidak ditemukan`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			//return console.log(detailRecipe.rows[0].photo);
 
 			// deleting photo
 			deleteFile(`public/${detailRecipe.rows[0].photo}`);
 			await recipeModel.recipeDeleteData(id);
-			success(res, null, "success", `Delete recipe dengan id ${id} berhasil`);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "success delete user",
+				data: null,
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	myRecipe: async (req, res) => {
@@ -197,19 +332,53 @@ const recipeController = {
 			const usersId = req.APP_DATA.tokenDecoded.id;
 			const data = await recipeModel.myRecipeData(usersId);
 			if (data.rowCount === 0) {
-				throw Error(`Anda belum mempunyai resep`);
+				const err = {
+					message: `Anda belum punya recipe`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
-			success(res, data.rows, "success", "berhasil menampilkan recipe anda");
-		} catch (error) {
-			failed(res, error.message, "failed", "error");
+
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "berhasil menampilkan recipe anda",
+				data: data.rows,
+				paggination: [],
+			});
+		} catch (err) {
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	latest5Recipe: async (req, res) => {
 		try {
 			const data = await recipeModel.latest5RecipeData();
-			success(res, data.rows, "success", "Sukses mendapatkan 5 resep terbaru");
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "Sukses mendapatkan 5 resep terbaru",
+				data: data.rows,
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "failed get data");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	recipeByUsers: async (req, res) => {
@@ -217,16 +386,32 @@ const recipeController = {
 			const usersId = req.params.usersId;
 			const data = await recipeModel.recipeByUsersData(usersId);
 			if (data.rowCount === 0) {
-				throw Error(`Data recipe users_id ${usersId} tidak ditemukan`);
+				const err = {
+					message: `Data recipe users_id ${usersId} tidak ditemukan`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
-			success(
-				res,
-				data.rows,
-				"success",
-				"berhasil mendapatkan data recipe dan user"
-			);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "berhasil mendapatkan data recipe dan user",
+				data: data.rows,
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "error occurred");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	recipeMode: async (req, res) => {
@@ -236,24 +421,58 @@ const recipeController = {
 			const detailRecipe = await recipeModel.recipeDetailData(id);
 
 			if (detailRecipe.rowCount == 0) {
-				throw Error(`invalid id`);
+				const err = {
+					message: `recipe with id ${id} not found`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			if (detailRecipe.rows[0].is_active == 1 && isActive == 1) {
-				throw Error(`This recipe is already active`);
+				const err = {
+					message: `recipe is already active`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			if (detailRecipe.rows[0].is_active == 0 && isActive == 0) {
-				throw Error(`This recipe is already nonactive`);
+				const err = {
+					message: `recipe is already nonactive`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			await recipeModel.recipeModeData(id, isActive);
 			const updatedRecipe = await recipeModel.recipeDetailData(id);
-			success(
-				res,
-				updatedRecipe.rows[0],
-				"success",
-				`berhasil mengubah mode recipe id ${id}`
-			);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "success ganti mode recipe",
+				data: updatedRecipe.rows[0],
+				paggination: [],
+			});
 		} catch (error) {
-			failed(res, error.message, "failed", "failed update");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: error.message,
+				error: [],
+			});
+			return;
 		}
 	},
 };

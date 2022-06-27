@@ -1,38 +1,104 @@
+//module.exports = {
+//    success: (res, data, status, message, pagination) => {
+//        if (pagination) {
+//            res.json({
+//                code: 200,
+//                status,
+//                data,
+//                pagination,
+//                error: null,
+//                message
+//            })
+//        } else {
+//            res.json({
+//                code: 200,
+//                status,
+//                data,
+//                error: null,
+//                message
+//            })
+//        }
+//    },
+//    failed: (res, error, status, message) => {
+//        res.status(500).json({
+//            code: 500,
+//            status,
+//            data: null,
+//            error,
+//            message
+//        })
+//    },
+//    successWithToken: (res, token, status, message) => {
+//        res.json({
+//            status,
+//            token,
+//            message
+//        })
+//    }
+//}
+
 module.exports = {
-    success: (res, data, status, message, pagination) => {
-        if (pagination) {
-            res.json({
-                code: 200,
-                status,
-                data,
-                pagination,
-                error: null,
-                message
-            })
-        } else {
-            res.json({
-                code: 200,
-                status,
-                data,
-                error: null,
-                message
-            })
-        }
-    },
-    failed: (res, error, status, message) => {
-        res.status(500).json({
-            code: 500,
-            status,
-            data: null,
-            error,
-            message
-        })
-    },
-    successWithToken: (res, token, status, message) => {
-        res.json({
-            status,
-            token,
-            message
-        })
-    }
-}
+	success: (res, payload) => {
+		const {
+			code,
+			status,
+			message,
+			data,
+			pagination = false,
+			token = false,
+		} = payload;
+
+		const response = {
+			code: code || 200,
+			status: status || "success",
+			message,
+			data,
+		};
+
+		// success with pagination
+		if (pagination) {
+			response.pagination = pagination;
+		}
+
+		// sucess with token
+		if (token) {
+			response.token = token;
+			delete response.data;
+		}
+
+		res.status(code).json(response);
+
+		// PENGGUNAAN
+		/*
+    success(res, {
+      code: 200,
+      status: success,
+      message: 'create user sucesss',
+      data: [],
+      paggination: []
+    })
+    */
+	},
+	failed: (res, payload) => {
+		const { code, status, message, error } = payload;
+
+		const response = {
+			code: code || 500,
+			status: status || "failed",
+			message,
+			error,
+		};
+
+		res.status(code).json(response);
+
+		// PENGGUNAAN
+		/*
+    failed(res, {
+      code: 400,
+      status: error || failed,
+      message: 'bad request',
+      error: []
+    })
+    */
+	},
+};

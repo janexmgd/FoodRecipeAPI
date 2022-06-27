@@ -17,9 +17,21 @@ const userController = {
 				dataPerPage: limitValue,
 				totalPage: Math.ceil(totalData / limitValue),
 			};
-			success(res, data.rows, "success", "get data success", pagination);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: `Success get data user`,
+				data: data.rows,
+				pagination: pagination,
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "internal server error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: error.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	usersDetail: async (req, res) => {
@@ -28,11 +40,32 @@ const userController = {
 			const data = await userModel.usersDetailData(id);
 			//   console.log(data.rows[0].photo);
 			if (data.rowCount === 0) {
-				throw Error(`Data dengan id ${id} tidak ditemukan`);
+				const err = {
+					message: `User with id ${id} not found`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
-			success(res, data.rows[0], "success", `get data id ${id} success`);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: `Success get user with id ${id}`,
+				data: data.rows[0],
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "Error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: error.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	usersEdit: async (req, res) => {
@@ -66,15 +99,33 @@ const userController = {
 			}
 
 			if (data.rowCount === 0) {
-				throw Error(
-					`Edit data users gagal karena users dengan id ${id} tidak ditemukan`
-				);
+				const err = {
+					message: `Edit data users gagal karena users dengan id ${id} tidak ditemukan`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			const dataEdited = await userModel.usersDetailData(id);
 			//return console.log(dataEdited);
-			success(res, dataEdited.rows[0], "success", `success edit data id ${id}`);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "Success Update user",
+				data: dataEdited.rows[0],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "internal server error");
+			failed(res, {
+				code: 500,
+				status: "Failed",
+				message: "Internal Server Error",
+				error: error.message,
+			});
+			return;
 		}
 	},
 	usersDelete: async (req, res) => {
@@ -82,14 +133,35 @@ const userController = {
 			const id = req.APP_DATA.tokenDecoded.id;
 			const user = await userModel.usersDetailData(id);
 			if (user.rowCount === 0) {
-				throw Error(`Delete data gagal, karena id ${id} tidak ditemukan`);
+				const err = {
+					message: `delete data users gagal karena users dengan id ${id} tidak ditemukan`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			// menghapus photo jika ada
 			deleteFile(`public/${user.rows[0].photo}`);
 			await userModel.usersDeleteData(id);
-			success(res, null, "success", `delete data id ${id} success`);
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "success delete user",
+				data: null,
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "internal server error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	usersMode: async (req, res) => {
@@ -98,20 +170,59 @@ const userController = {
 			const { isActive } = req.body;
 			const user = await userModel.usersDetailData(id);
 			if (user.rowCount == 0) {
-				throw Error(`Change mode users gagal, karena id ${id} tidak ditemukan`);
+				const err = {
+					message: `user with id ${id} not found`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			//return console.log(user.rows[0].is_active);
 			if (user.rows[0].is_active == 1 && isActive == 1) {
-				throw Error(`This user is already active`);
+				const err = {
+					message: `user is already active`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			if (user.rows[0].is_active == 0 && isActive == 0) {
-				throw Error(`This user is already nonactive`);
+				const err = {
+					message: `user is already nonactive`,
+				};
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: err.message,
+					error: [],
+				});
+				return;
 			}
 			await userModel.usersModeData(id, isActive);
 			const userEdited = await userModel.usersDetailData(id);
-			success(res, userEdited.rows[0], "success", "success ganti mode users");
+			success(res, {
+				code: 200,
+				status: "success",
+				message: "success ganti mode users",
+				data: userEdited.rows[0],
+				paggination: [],
+			});
 		} catch (err) {
-			failed(res, err.message, "failed", "internal server error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: err.message,
+				error: [],
+			});
+			return;
 		}
 	},
 	usersResetPass: async (req, res) => {
@@ -123,16 +234,40 @@ const userController = {
 				userModel
 					.usersResetPassData(id, hashNewPass)
 					.then((result) => {
-						success(res, result, "success", "register berhasil", null);
+						success(res, {
+							code: 200,
+							status: "success",
+							message: "success ganti mode recipe",
+							data: result,
+							paggination: [],
+						});
 					})
 					.catch((err) => {
-						failed(res, err.detail, "failed", "register gagal");
+						failed(res, {
+							code: 500,
+							status: "error",
+							message: err.message,
+							error: [],
+						});
+						return;
 					});
 			} else {
-				throw Error("newPass dan confirmNewPass harus sama");
+				failed(res, {
+					code: 500,
+					status: "error",
+					message: "newPass dan confirmNewPass harus sama",
+					error: [],
+				});
+				return;
 			}
 		} catch (error) {
-			failed(res, error.message, "failed", "Internal server error");
+			failed(res, {
+				code: 500,
+				status: "error",
+				message: error.message,
+				error: [],
+			});
+			return;
 		}
 	},
 };
