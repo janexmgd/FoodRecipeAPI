@@ -36,7 +36,7 @@ app.get("/", (req, res) => {
 	res.json("WELLCOME AT FOOD RECIPE API :)");
 });
 
-const PORT = process.env.LISTENPORT || 3004;
+const PORT = process.env.PORT || 3004;
 
 app.listen(PORT, "0.0.0.0", () => {
 	//console.clear();
