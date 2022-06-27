@@ -13,8 +13,18 @@ module.exports = (req, res, next) => {
 		if (req.file) {
 			deleteFile(`public/${req.file.filename}`);
 		}
-		return failed(res, extractErr, "failed", "failed in validation");
+		return failed(res, {
+			code: 400,
+			status: "failed",
+			message: "failed in validation",
+			error: extractErr,
+		});
 	} catch (error) {
-		failed(res, error.message, "error", "internal server error");
+		failed(res, {
+			code: 500,
+			status: "error",
+			message: "internal server error",
+			error: error.message,
+		});
 	}
 };
