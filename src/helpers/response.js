@@ -20,7 +20,7 @@ module.exports = {
         }
     },
     failed: (res, error, status, message) => {
-        res.json({
+        res.status(500).json({
             code: 500,
             status,
             data: null,
