@@ -1,23 +1,22 @@
-const {
-    Pool
-} = require('pg')
+const { Pool } = require("pg");
 // const {
 //     user,
 //     port
 // } = require('pg/lib/defaults')
-require('dotenv').config()
-
+require("dotenv").config();
 
 const db = new Pool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-})
+	host: process.env.DB_HOST,
+	user: process.env.DB_USER,
+	password: process.env.DB_PASS,
+	database: process.env.DB_NAME,
+	port: process.env.DB_PORT,
+});
 db.connect((err) => {
-    if (err) {
-        console.log(err);
-    }
-})
-module.exports = db
+	if (err) {
+		console.log(err);
+	} else {
+		console.log("DB CONNECTED");
+	}
+});
+module.exports = db;
