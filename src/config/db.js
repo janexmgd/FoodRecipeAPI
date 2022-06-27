@@ -12,7 +12,7 @@ const db = new Pool({
 	database: process.env.DB_NAME,
 	port: process.env.DB_PORT,
 	ssl: {
-		rejectUnauthorized: true,
+		rejectUnauthorized: false,
 	},
 });
 db.connect((err) => {
