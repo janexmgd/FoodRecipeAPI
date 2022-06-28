@@ -24,10 +24,17 @@ const recipeModel = {
 			);
 		});
 	},
-	recipeAdminData: (searchQuery, offsetValue, limitValue) => {
+	recipeAdminData: (
+		searchQuery,
+		offsetValue,
+		limitValue,
+		sortQuery,
+		modeQuery
+	) => {
 		return new Promise((resolve, reject) => {
 			db.query(
-				`SELECT * FROM recipe WHERE LOWER(title) LIKE LOWER ('%${searchQuery}%') ORDER BY id LIMIT ${limitValue} OFFSET ${offsetValue}`,
+				`SELECT * FROM recipe WHERE LOWER(title) LIKE LOWER ('%${searchQuery}%') 
+				ORDER BY ${sortQuery} ${modeQuery} LIMIT ${limitValue} OFFSET ${offsetValue}`,
 				(err, result) => {
 					if (err) {
 						reject(err);
@@ -37,10 +44,17 @@ const recipeModel = {
 			);
 		});
 	},
-	recipeMainData: (searchQuery, offsetValue, limitValue, sortQuery) => {
+	recipeMainData: (
+		searchQuery,
+		offsetValue,
+		limitValue,
+		sortQuery,
+		modeQuery
+	) => {
 		return new Promise((resolve, reject) => {
 			db.query(
-				`SELECT * FROM recipe WHERE is_active=1 AND LOWER(title) LIKE LOWER ('%${searchQuery}%') ORDER BY ${sortQuery} LIMIT ${limitValue} OFFSET ${offsetValue}`,
+				`SELECT * FROM recipe WHERE is_active=1 AND LOWER(title) LIKE LOWER ('%${searchQuery}%') 
+				ORDER BY ${sortQuery} ${modeQuery} LIMIT ${limitValue} OFFSET ${offsetValue}`,
 				(err, result) => {
 					if (err) {
 						reject(err);

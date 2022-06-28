@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-useless-return */
 /* eslint-disable no-unneeded-ternary */
 const recipeModel = require("../models/recipe.model");
 const { success, failed } = require("../helpers/response");
@@ -7,17 +9,21 @@ const deleteFile = require("../helpers/deleteFile");
 const recipeController = {
 	recipeAdmin: async (req, res) => {
 		try {
-			const { search, page, limit } = req.query;
+			const { search, page, limit, sort, mode } = req.query;
 			const searchQuery = search || "";
 			const pageValue = page ? Number(page) : 1;
 			const limitValue = limit ? Number(limit) : 5;
 			const offsetValue = (pageValue - 1) * limitValue;
+			const sortQuery = sort ? sort : "title";
+			const modeQuery = mode ? mode : "ASC";
 			const alldata = await recipeModel.Alldata();
 			const totalData = Number(alldata.rows[0].total);
 			const data = await recipeModel.recipeAdminData(
 				searchQuery,
 				offsetValue,
-				limitValue
+				limitValue,
+				sortQuery,
+				modeQuery
 			);
 			if (data.rowCount === 0) {
 				const err = {
@@ -64,7 +70,7 @@ const recipeController = {
 			failed(res, {
 				code: 500,
 				status: "error",
-				message: error.message,
+				message: err.message,
 				error: [],
 			});
 			return;
@@ -72,10 +78,11 @@ const recipeController = {
 	},
 	recipeMain: async (req, res) => {
 		try {
-			const { search, page, limit, sort } = req.query;
+			const { search, page, limit, sort, mode } = req.query;
 			const searchQuery = search || "";
 			const pageValue = page ? Number(page) : 1;
-			const sortQuery = sort ? sort : "id";
+			const sortQuery = sort ? sort : "title";
+			const modeQuery = mode ? mode : "ASC";
 			const limitValue = limit ? Number(limit) : 100;
 			const offsetValue = (pageValue - 1) * limitValue;
 			const alldata = await recipeModel.activeData();
@@ -84,7 +91,8 @@ const recipeController = {
 				searchQuery,
 				offsetValue,
 				limitValue,
-				sortQuery
+				sortQuery,
+				modeQuery
 			);
 			if (data.rowCount === 0) {
 				const err = {
@@ -131,7 +139,7 @@ const recipeController = {
 			failed(res, {
 				code: 500,
 				status: "error",
-				message: error.message,
+				message: err.message,
 				error: [],
 			});
 			return;
@@ -164,7 +172,7 @@ const recipeController = {
 			failed(res, {
 				code: 500,
 				status: "error",
-				message: error.message,
+				message: err.message,
 				error: [],
 			});
 			return;
@@ -204,7 +212,7 @@ const recipeController = {
 				usersId,
 				date,
 			};
-			//return console.log(data);
+			// return console.log(data);
 			await recipeModel.recipeInsertData(data);
 
 			success(res, {
@@ -247,7 +255,7 @@ const recipeController = {
 
 			let data;
 			if (req.file) {
-				//return console.log(detailOld.rows[0].photo);
+				// return console.log(detailOld.rows[0].photo);
 				deleteFile(`public/${detailOld.rows[0].photo}`);
 
 				data = await recipeModel.recipeEditData(
@@ -305,7 +313,7 @@ const recipeController = {
 				});
 				return;
 			}
-			//return console.log(detailRecipe.rows[0].photo);
+			// return console.log(detailRecipe.rows[0].photo);
 
 			// deleting photo
 			deleteFile(`public/${detailRecipe.rows[0].photo}`);
@@ -420,7 +428,7 @@ const recipeController = {
 			const { isActive } = req.body;
 			const detailRecipe = await recipeModel.recipeDetailData(id);
 
-			if (detailRecipe.rowCount == 0) {
+			if (detailRecipe.rowCount === 0) {
 				const err = {
 					message: `recipe with id ${id} not found`,
 				};
@@ -432,7 +440,7 @@ const recipeController = {
 				});
 				return;
 			}
-			if (detailRecipe.rows[0].is_active == 1 && isActive == 1) {
+			if (detailRecipe.rows[0].is_active === 1 && isActive === 1) {
 				const err = {
 					message: `recipe is already active`,
 				};
@@ -444,7 +452,7 @@ const recipeController = {
 				});
 				return;
 			}
-			if (detailRecipe.rows[0].is_active == 0 && isActive == 0) {
+			if (detailRecipe.rows[0].is_active === 0 && isActive === 0) {
 				const err = {
 					message: `recipe is already nonactive`,
 				};
