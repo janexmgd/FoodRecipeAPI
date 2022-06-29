@@ -23,7 +23,7 @@ const commentController = {
 				status: "success",
 				message: `Success get comment`,
 				data: data.rows,
-				paggination: pagination,
+				pagination: pagination,
 			});
 		} catch (err) {
 			failed(res, {
@@ -56,7 +56,7 @@ const commentController = {
 				status: "success",
 				message: `Success get comment with id ${id}`,
 				data: data.rows[0],
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -101,7 +101,7 @@ const commentController = {
 				status: "success",
 				message: "berhasil menambahkan comment",
 				data: data,
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -146,7 +146,7 @@ const commentController = {
 				status: "success",
 				message: `Edit data comment dengan id ${id} berhasil`,
 				data: data,
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -180,7 +180,7 @@ const commentController = {
 				status: "success",
 				message: `Delete data comment id ${id} berhasil`,
 				data: null,
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -213,7 +213,7 @@ const commentController = {
 				status: "success",
 				message: "berhasil menampilkan data comment dan recipe",
 				data: data.rows,
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {

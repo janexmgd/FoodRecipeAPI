@@ -56,7 +56,7 @@ const userController = {
 				status: "success",
 				message: `Success get user with id ${id}`,
 				data: data.rows[0],
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -152,7 +152,7 @@ const userController = {
 				status: "success",
 				message: "success delete user",
 				data: null,
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -213,7 +213,7 @@ const userController = {
 				status: "success",
 				message: "success ganti mode users",
 				data: userEdited.rows[0],
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -239,7 +239,7 @@ const userController = {
 							status: "success",
 							message: "success ganti mode recipe",
 							data: result,
-							paggination: [],
+							pagination: [],
 						});
 					})
 					.catch((err) => {

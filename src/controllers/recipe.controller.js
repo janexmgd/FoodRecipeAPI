@@ -49,7 +49,7 @@ const recipeController = {
 					status: "success",
 					message: `Success get Recipe`,
 					data: data.rows,
-					paggination: pagination,
+					pagination: pagination,
 				});
 			} else {
 				const pagination = {
@@ -63,7 +63,7 @@ const recipeController = {
 					status: "success",
 					message: `Success get Recipe`,
 					data: data.rows,
-					paggination: pagination,
+					pagination: pagination,
 				});
 			}
 		} catch (err) {
@@ -113,12 +113,13 @@ const recipeController = {
 					dataPerPage: limitValue,
 					totalPage: Math.ceil(data.rowCount / limitValue),
 				};
+				//return console.log(pagination);
 				success(res, {
 					code: 200,
 					status: "success",
 					message: `Success get Recipe`,
 					data: data.rows,
-					paggination: pagination,
+					pagination: pagination,
 				});
 			} else {
 				const pagination = {
@@ -126,13 +127,13 @@ const recipeController = {
 					dataPerPage: limitValue,
 					totalPage: Math.ceil(totalData / limitValue),
 				};
-
+				//return console.log(pagination);
 				success(res, {
 					code: 200,
 					status: "success",
 					message: `Success get Recipe`,
 					data: data.rows,
-					paggination: pagination,
+					pagination: pagination,
 				});
 			}
 		} catch (err) {
@@ -166,7 +167,7 @@ const recipeController = {
 				status: "success",
 				message: `Success get Recipe with id ${id}`,
 				data: data.rows[0],
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -220,7 +221,7 @@ const recipeController = {
 				status: "success",
 				message: "Berhasil menambahkan recipe",
 				data: data,
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -285,7 +286,7 @@ const recipeController = {
 				status: "success",
 				message: "success edit recipe",
 				data: dataEdited.rows[0],
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -323,7 +324,7 @@ const recipeController = {
 				status: "success",
 				message: "success delete user",
 				data: null,
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -357,7 +358,7 @@ const recipeController = {
 				status: "success",
 				message: "berhasil menampilkan recipe anda",
 				data: data.rows,
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -377,7 +378,7 @@ const recipeController = {
 				status: "success",
 				message: "Sukses mendapatkan 5 resep terbaru",
 				data: data.rows,
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -410,7 +411,7 @@ const recipeController = {
 				status: "success",
 				message: "berhasil mendapatkan data recipe dan user",
 				data: data.rows,
-				paggination: [],
+				pagination: [],
 			});
 		} catch (err) {
 			failed(res, {
@@ -471,7 +472,7 @@ const recipeController = {
 				status: "success",
 				message: "success ganti mode recipe",
 				data: updatedRecipe.rows[0],
-				paggination: [],
+				pagination: [],
 			});
 		} catch (error) {
 			failed(res, {
