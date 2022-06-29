@@ -25,18 +25,18 @@ const recipeController = {
 				sortQuery,
 				modeQuery
 			);
-			if (data.rowCount === 0) {
-				const err = {
-					message: `tidak ditemukan data dengan kata kunci ${searchQuery}`,
-				};
-				failed(res, {
-					code: 500,
-					status: "error",
-					message: err.message,
-					error: [],
-				});
-				return;
-			}
+			//if (data.rowCount === 0) {
+			//	const err = {
+			//		message: `tidak ditemukan data dengan kata kunci ${searchQuery}`,
+			//	};
+			//	failed(res, {
+			//		code: 500,
+			//		status: "error",
+			//		message: err.message,
+			//		error: [],
+			//	});
+			//	return;
+			//}
 			// cek pakai search apa enggak
 			if (search) {
 				const pagination = {
@@ -94,18 +94,18 @@ const recipeController = {
 				sortQuery,
 				modeQuery
 			);
-			if (data.rowCount === 0) {
-				const err = {
-					message: `tidak ditemukan data dengan kata kunci ${searchQuery}`,
-				};
-				failed(res, {
-					code: 500,
-					status: "error",
-					message: err.message,
-					error: [],
-				});
-				return;
-			}
+			//if (data.rowCount === 0) {
+			//	const err = {
+			//		message: `tidak ditemukan data dengan kata kunci ${searchQuery}`,
+			//	};
+			//	failed(res, {
+			//		code: 500,
+			//		status: "error",
+			//		message: err.message,
+			//		error: [],
+			//	});
+			//	return;
+			//}
 			// cek pakai search apa enggak
 			if (search) {
 				const pagination = {
