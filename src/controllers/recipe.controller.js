@@ -322,7 +322,7 @@ const recipeController = {
 			success(res, {
 				code: 200,
 				status: "success",
-				message: "success delete user",
+				message: "success delete recipe",
 				data: null,
 				pagination: [],
 			});
